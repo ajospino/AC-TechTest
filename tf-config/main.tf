@@ -1,7 +1,27 @@
-resource "aws_instance" "ac_technical_test" {
-  ami = data.aws_ami.ubuntu
-  instance_type = var.instance_type
+resource "aws_launch_template" "ac_tt_script" {
+    name_prefix   = "ac-tt-instance"
+    image_id      =  data.aws_ami.ubuntu
+    instance_type =  var.instance_type
+
+    user_data = filebase64("${path.module}/launch_script.sh")
+    
+    vpc_security_group_ids = [ aws_security_group.ac_tt.id ]
 }
+
+resource "aws_autoscaling_group" "ac_tt_instamnces" {
+    availability_zones = ["us-east-2a"]
+    desired_capacity   = 1
+    max_size           = 5
+    min_size           = 1
+
+    launch_template = {
+      id      = "${aws_launch_template.ac_tt_script.id}"
+      version = "$$Latest"
+    }
+
+    vpc_zone_identifier = [ aws_subnet.ac_tt.id ]
+}
+
 
 resource "aws_db_instance" "ac_tt" {
   allocated_storage    = 10
@@ -15,6 +35,8 @@ resource "aws_db_instance" "ac_tt" {
   
   parameter_group_name = "default.mysql5.7"
   skip_final_snapshot  = true
+
+  vpc_security_group_ids = [ aws_security_group.ac_tt.id ]
 }
 
 resource "aws_vpc" "ac_tt" {
