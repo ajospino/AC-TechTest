@@ -3,7 +3,7 @@ resource "aws_launch_template" "ac_tt_script" {
     image_id      =  data.aws_ami.ubuntu
     instance_type =  var.instance_type
 
-    user_data = filebase64("${path.module}/launch_script.sh")
+    user_data = filebase64("../launch_script.sh")
     
     vpc_security_group_ids = [ aws_security_group.ac_tt.id ]
 }
