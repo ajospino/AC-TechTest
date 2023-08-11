@@ -22,7 +22,7 @@ sudo apt-get update
 
 ### Installation ###
 
-sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
 # Testing the install 
 
@@ -30,3 +30,6 @@ sudo docker run hello-world
 
 # Running new code
 
+sudo docker pull 644643037339.dkr.ecr.us-east-2.amazonaws.com/ac-tt-version:latest
+
+sudo docker run -d -p 80:80 644643037339.dkr.ecr.us-east-2.amazonaws.com/ac-tt-version:latest
