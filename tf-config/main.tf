@@ -16,7 +16,6 @@ resource "aws_launch_template" "ac_tt_script" {
 }
 
 resource "aws_autoscaling_group" "ac_tt_instamnces" {
-    availability_zones = ["us-east-2a"]
     desired_capacity   = 1
     max_size           = 5
     min_size           = 1
