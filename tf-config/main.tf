@@ -13,9 +13,14 @@ resource "aws_launch_template" "ac_tt_script" {
     user_data = filebase64("../launch_script.sh")
     
     vpc_security_group_ids = [ aws_security_group.ac_tt.id ]
+    
+    network_interfaces {
+      subnet_id = aws_subnet.ac_tt.id
+    }
+
 }
 
-resource "aws_autoscaling_group" "ac_tt_instamnces" {
+resource "aws_autoscaling_group" "ac_tt_instances" {
     desired_capacity   = 1
     max_size           = 5
     min_size           = 1
@@ -28,21 +33,29 @@ resource "aws_autoscaling_group" "ac_tt_instamnces" {
     vpc_zone_identifier = [ aws_subnet.ac_tt.id ]
 }
 
+resource "aws_db_subnet_group" "ac_tt" {
+  name       = "main"
+  subnet_ids = [ aws_subnet.ac_tt.id ]
+
+  tags = {
+    Name = "Main DB subnet group"
+  }
+}
 
 resource "aws_db_instance" "ac_tt" {
   allocated_storage    = 10
-  db_name              = "mydb"
-  engine               = "mysql"
-  engine_version       = "5.7"
+  db_name              = "ac_tt_db"
+  engine               = "postgres"
+  engine_version       = "13.2"
   instance_class       = var.db_instance_type
   
   username             = var.db_user
   manage_master_user_password = true
   
-  parameter_group_name = "default.mysql5.7"
   skip_final_snapshot  = true
 
   vpc_security_group_ids = [ aws_security_group.ac_tt.id ]
+  db_subnet_group_name = aws_db_subnet_group.ac_tt.name
 }
 
 resource "aws_vpc" "ac_tt" {
@@ -114,6 +127,6 @@ resource "aws_security_group" "ac_tt" {
     }
 
     tags = {
-        Name = "allow_tls"
+        Name = "main_security_group"
     }
 }
