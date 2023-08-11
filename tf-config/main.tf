@@ -21,9 +21,9 @@ resource "aws_autoscaling_group" "ac_tt_instamnces" {
     max_size           = 5
     min_size           = 1
 
-    launch_template = {
-      id      = "${aws_launch_template.ac_tt_script.id}"
-      version = "$$Latest"
+    launch_template {
+      id      = aws_launch_template.ac_tt_script.id
+      version = "$Latest"
     }
 
     vpc_zone_identifier = [ aws_subnet.ac_tt.id ]
