@@ -22,11 +22,27 @@ sudo apt-get update
 
 ### Installation ###
 
-sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
 # Testing the install 
 
 sudo docker run hello-world
 
+#
+sudo apt-get install unzip
+
+#
+
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+
+#
+
+echo AKIAZMF5YECNQABEPP5Y | echo GR2zOZfsoGbH9qmWVW7zbYhZM4Rk5WZ8Kjt/O0Rl | echo us-east-2 | echo | aws configure
+
 # Running new code
 
+sudo docker pull 644643037339.dkr.ecr.us-east-2.amazonaws.com/ac-tt-version:latest
+
+sudo docker run -d -p 80:80 5432:5432 644643037339.dkr.ecr.us-east-2.amazonaws.com/ac-tt-version:latest
