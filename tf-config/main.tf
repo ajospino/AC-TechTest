@@ -3,6 +3,13 @@ resource "aws_launch_template" "ac_tt_script" {
     image_id      =  data.aws_ami.ubuntu
     instance_type =  var.instance_type
 
+    block_device_mappings {
+      device_name = "/dev/sdf"
+      ebs {
+        volume_size = 20
+      }
+    }
+
     user_data = filebase64("../launch_script.sh")
     
     vpc_security_group_ids = [ aws_security_group.ac_tt.id ]
@@ -80,7 +87,7 @@ resource "aws_security_group" "ac_tt" {
         from_port        = 22
         to_port          = 22
         protocol         = "tcp"
-        cidr_blocks      = ["181.131.210.140/30"]
+        cidr_blocks      = ["181.131.210.140/32"]
     }
 
     ingress {
@@ -88,7 +95,7 @@ resource "aws_security_group" "ac_tt" {
         from_port        = 443
         to_port          = 443
         protocol         = "tcp"
-        cidr_blocks      = ["181.131.210.140/30"]
+        cidr_blocks      = ["181.131.210.140/32"]
     }
 
     ingress {
@@ -96,7 +103,7 @@ resource "aws_security_group" "ac_tt" {
         from_port        = 80
         to_port          = 80
         protocol         = "tcp"
-        cidr_blocks      = ["181.131.210.140/30"]
+        cidr_blocks      = ["181.131.210.140/32"]
     }
 
     egress {
