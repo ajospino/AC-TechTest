@@ -11,10 +11,10 @@ RUN wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor 
         # apt install code
 
 RUN wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb \
-        && sudo dpkg -i packages-microsoft-prod.deb \
+        && dpkg -i packages-microsoft-prod.deb \
         && rm packages-microsoft-prod.deb
-RUN sudo apt-get update && \
-        sudo apt-get install -y dotnet-sdk-7.0
+RUN apt-get update && \
+        apt-get install -y dotnet-sdk-7.0
 
 
 RUN apt-get install -y openjdk-17-jre-headless
