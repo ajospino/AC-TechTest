@@ -1,8 +1,9 @@
 resource "aws_launch_template" "ac_tt_script" {
     name_prefix   = "ac-tt-instance"
-    image_id      =  data.aws_ami.ubuntu
+    image_id      =  data.aws_ami.ubuntu.id
     instance_type =  var.instance_type
 
+    key_name = "myKey"
     block_device_mappings {
       device_name = "/dev/sdf"
       ebs {
@@ -12,10 +13,9 @@ resource "aws_launch_template" "ac_tt_script" {
 
     user_data = filebase64("../launch_script.sh")
     
-    vpc_security_group_ids = [ aws_security_group.ac_tt.id ]
-    
     network_interfaces {
       subnet_id = aws_subnet.ac_tt.id
+      security_groups = [ aws_security_group.ac_tt.id ]
     }
 
 }
@@ -35,7 +35,7 @@ resource "aws_autoscaling_group" "ac_tt_instances" {
 
 resource "aws_db_subnet_group" "ac_tt" {
   name       = "main"
-  subnet_ids = [ aws_subnet.ac_tt.id ]
+  subnet_ids = [ aws_subnet.ac_tt.id, aws_subnet.ac_tt_2.id]
 
   tags = {
     Name = "Main DB subnet group"
@@ -46,7 +46,7 @@ resource "aws_db_instance" "ac_tt" {
   allocated_storage    = 10
   db_name              = "ac_tt_db"
   engine               = "postgres"
-  engine_version       = "13.2"
+  engine_version       = "15.3"
   instance_class       = var.db_instance_type
   
   username             = var.db_user
@@ -68,18 +68,30 @@ resource "aws_vpc" "ac_tt" {
 
 resource "aws_subnet" "ac_tt" {
   vpc_id = aws_vpc.ac_tt.id
-  cidr_block = "10.10.0.0/24"
+  cidr_block = "10.10.10.0/24"
+  availability_zone = "us-east-2b"
+}
+
+resource "aws_subnet" "ac_tt_2" {
+  vpc_id = aws_vpc.ac_tt.id
+  cidr_block = "10.10.12.0/24"
+  availability_zone = "us-east-2a"
 }
 
 resource "aws_internet_gateway" "ac_tt" {
   vpc_id = aws_vpc.ac_tt.id
 }
 
+resource "aws_route_table_association" "ac_tt" {
+  subnet_id = aws_subnet.ac_tt.id
+  route_table_id = aws_route_table.ac_tt.id
+}
+
 resource "aws_route_table" "ac_tt" {
     vpc_id = aws_vpc.ac_tt.id
 
     route {
-        cidr_block = aws_subnet.ac_tt.cidr_block
+        cidr_block = "0.0.0.0/0"
         gateway_id = aws_internet_gateway.ac_tt.id
     }
 
@@ -99,7 +111,7 @@ resource "aws_security_group" "ac_tt" {
         from_port        = 22
         to_port          = 22
         protocol         = "tcp"
-        cidr_blocks      = ["181.131.210.140/32"]
+        cidr_blocks      = ["181.131.210.140/32", "191.156.48.238/32"]
     }
 
     ingress {
@@ -107,7 +119,7 @@ resource "aws_security_group" "ac_tt" {
         from_port        = 443
         to_port          = 443
         protocol         = "tcp"
-        cidr_blocks      = ["181.131.210.140/32"]
+        cidr_blocks      = ["181.131.210.140/32", "191.156.48.238/32"]
     }
 
     ingress {
@@ -115,7 +127,7 @@ resource "aws_security_group" "ac_tt" {
         from_port        = 80
         to_port          = 80
         protocol         = "tcp"
-        cidr_blocks      = ["181.131.210.140/32"]
+        cidr_blocks      = ["181.131.210.140/32", "191.156.48.238/32"]
     }
 
     egress {
