@@ -1,4 +1,4 @@
-resource "aws_s3_bucket" "ac_tt_state" {
+/* resource "aws_s3_bucket" "ac_tt_state" {
   bucket = "ac-tt-tfstate"
   
   lifecycle {
@@ -16,15 +16,15 @@ resource "aws_dynamodb_table" "ac_tt_statelock" {
     name = "LockID"
     type = "S"
   }
-}
+} */
 
 
 
 terraform {
   backend "s3"{
-    bucket = aws_s3_bucket.ac_tt_state.name
+    bucket = "ac-tt-tfstate"
     key = "main"
-    region = var.region
-    dynamodb_table = aws_dynamodb_table.ac_tt_statelock.name
+    region = "us-east-2"
+    dynamodb_table = "ac-tt-dyn-table"
   }
 }

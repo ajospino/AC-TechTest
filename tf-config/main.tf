@@ -3,7 +3,7 @@ resource "aws_launch_template" "ac_tt_script" {
     image_id      =  data.aws_ami.ubuntu.id
     instance_type =  var.instance_type
 
-    key_name = "myKey"
+    key_name = "mainKey"
     block_device_mappings {
       device_name = "/dev/sdf"
       ebs {
@@ -16,14 +16,33 @@ resource "aws_launch_template" "ac_tt_script" {
     network_interfaces {
       subnet_id = aws_subnet.ac_tt.id
       security_groups = [ aws_security_group.ac_tt.id ]
+      associate_public_ip_address = true
     }
 
+}
+
+resource "tls_private_key" "pk" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "aws_key_pair" "kp" {
+  key_name   = "mainKey"      
+  public_key = tls_private_key.pk.public_key_openssh
+
+}
+
+resource "local_file" "ssh_key" {
+  filename = "${aws_key_pair.kp.key_name}.pem"
+  content = tls_private_key.pk.private_key_pem
 }
 
 resource "aws_autoscaling_group" "ac_tt_instances" {
     desired_capacity   = 1
     max_size           = 5
     min_size           = 1
+
+    name = "ac-tt"
 
     launch_template {
       id      = aws_launch_template.ac_tt_script.id
@@ -111,7 +130,7 @@ resource "aws_security_group" "ac_tt" {
         from_port        = 22
         to_port          = 22
         protocol         = "tcp"
-        cidr_blocks      = ["181.131.210.140/32", "191.156.48.238/32"]
+        cidr_blocks      = ["181.131.210.140/32", "191.156.49.85/32"]
     }
 
     ingress {
@@ -119,7 +138,7 @@ resource "aws_security_group" "ac_tt" {
         from_port        = 443
         to_port          = 443
         protocol         = "tcp"
-        cidr_blocks      = ["181.131.210.140/32", "191.156.48.238/32"]
+        cidr_blocks      = ["181.131.210.140/32", "191.156.49.85/32"]
     }
 
     ingress {
@@ -127,8 +146,17 @@ resource "aws_security_group" "ac_tt" {
         from_port        = 80
         to_port          = 80
         protocol         = "tcp"
-        cidr_blocks      = ["181.131.210.140/32", "191.156.48.238/32"]
+        cidr_blocks      = ["181.131.210.140/32", "191.156.49.85/32"]
     }
+
+    ingress {
+        description      = "PostgreSQL port"
+        from_port        = 5432
+        to_port          = 5432
+        protocol         = "tcp"
+        cidr_blocks      = ["181.131.210.140/32", "191.156.49.85/32"]
+    }
+
 
     egress {
         from_port        = 0
