@@ -65,11 +65,12 @@ resource "aws_db_instance" "ac_tt" {
   allocated_storage    = 10
   db_name              = "ac_tt_db"
   engine               = "postgres"
-  engine_version       = "15.3"
+  engine_version       = "12.15"
   instance_class       = var.db_instance_type
+  publicly_accessible = true
   
   username             = var.db_user
-  manage_master_user_password = true
+  password             = var.db_password
   
   skip_final_snapshot  = true
 
@@ -79,6 +80,9 @@ resource "aws_db_instance" "ac_tt" {
 
 resource "aws_vpc" "ac_tt" {
   cidr_block = "10.10.0.0/16"
+
+  enable_dns_hostnames = true
+  enable_dns_support = true
 
   tags = {
     Name = "main"
@@ -130,7 +134,7 @@ resource "aws_security_group" "ac_tt" {
         from_port        = 22
         to_port          = 22
         protocol         = "tcp"
-        cidr_blocks      = ["181.131.210.140/32", "191.156.49.85/32"]
+        cidr_blocks      = ["181.131.210.140/32", "191.156.0.0/16"]
     }
 
     ingress {
@@ -138,7 +142,7 @@ resource "aws_security_group" "ac_tt" {
         from_port        = 443
         to_port          = 443
         protocol         = "tcp"
-        cidr_blocks      = ["181.131.210.140/32", "191.156.49.85/32"]
+        cidr_blocks      = ["181.131.210.140/32", "191.156.0.0/16"]
     }
 
     ingress {
@@ -146,7 +150,7 @@ resource "aws_security_group" "ac_tt" {
         from_port        = 80
         to_port          = 80
         protocol         = "tcp"
-        cidr_blocks      = ["181.131.210.140/32", "191.156.49.85/32"]
+        cidr_blocks      = ["181.131.210.140/32", "191.156.0.0/16"]
     }
 
     ingress {
@@ -154,7 +158,7 @@ resource "aws_security_group" "ac_tt" {
         from_port        = 5432
         to_port          = 5432
         protocol         = "tcp"
-        cidr_blocks      = ["181.131.210.140/32", "191.156.49.85/32"]
+        cidr_blocks      = ["181.131.210.140/32", "191.156.0.0/16"]
     }
 
 
