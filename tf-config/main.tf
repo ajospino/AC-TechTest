@@ -142,7 +142,7 @@ resource "aws_security_group" "ac_tt" {
         from_port        = 443
         to_port          = 443
         protocol         = "tcp"
-        cidr_blocks      = ["181.131.210.140/32", "191.156.0.0/16"]
+        cidr_blocks      = ["181.131.210.140/32", "191.156.0.0/16", "10.10.10.0/24"]
     }
 
     ingress {
@@ -150,7 +150,7 @@ resource "aws_security_group" "ac_tt" {
         from_port        = 80
         to_port          = 80
         protocol         = "tcp"
-        cidr_blocks      = ["181.131.210.140/32", "191.156.0.0/16"]
+        cidr_blocks      = ["181.131.210.140/32", "191.156.0.0/16", "10.10.10.0/24"]
     }
 
     ingress {
@@ -158,7 +158,7 @@ resource "aws_security_group" "ac_tt" {
         from_port        = 5432
         to_port          = 5432
         protocol         = "tcp"
-        cidr_blocks      = ["181.131.210.140/32", "191.156.0.0/16"]
+        cidr_blocks      = ["181.131.210.140/32", "191.156.0.0/16", "10.10.10.0/24"]
     }
 
 

@@ -27,3 +27,12 @@ sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plug
 # Testing the install 
 
 sudo docker run hello-world
+
+#
+sudo apt-get install unzip
+
+#
+
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
